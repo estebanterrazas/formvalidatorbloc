@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:formvalidation/src/bloc/provider.dart';
+// import 'package:formvalidation/src/bloc/provider.dart';
 import 'package:formvalidation/src/models/producto_model.dart';
 import 'package:formvalidation/src/providers/productos_provider.dart';
 
@@ -11,7 +11,7 @@ class HomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
 
-    final bloc = Provider.of(context);
+    // final bloc = Provider.of(context);
     
     
     return Scaffold(
@@ -53,12 +53,12 @@ class HomePage extends StatelessWidget {
           color: Colors.red,
         ),
         onDismissed: (direccion){
-          // TODO: Borrar producto
+          productosProvider.borrarProducto(producto.id);
         },
         child: ListTile(
         title: Text('${ producto.titulo } - ${ producto.valor }'),
         subtitle: Text(producto.id),
-        onTap: ()=> Navigator.pushNamed(context, 'producto'),
+        onTap: ()=> Navigator.pushNamed(context, 'producto', arguments: producto),
       ),
     );
   }
