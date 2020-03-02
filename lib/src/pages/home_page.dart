@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:formvalidation/src/bloc/provider.dart';
 // import 'package:formvalidation/src/bloc/provider.dart';
 import 'package:formvalidation/src/models/producto_model.dart';
 import 'package:formvalidation/src/providers/productos_provider.dart';
@@ -6,28 +7,30 @@ import 'package:formvalidation/src/providers/productos_provider.dart';
 class HomePage extends StatelessWidget {
 
 
-  final productosProvider = new ProductosProvider();
+
 
   @override
   Widget build(BuildContext context) {
 
     // final bloc = Provider.of(context);
+    final productosBloc = Provider.productosBloc(context);
+    productosBloc.cargarProductos();
     
     
     return Scaffold(
       appBar: AppBar(
         title: Text('Home')
       ),
-      body: _crearListado(),
+      body: _crearListado(productosBloc),
       floatingActionButton: _crearBoton(context),
     );
   }
 
-  Widget _crearListado(){
+  Widget _crearListado(ProductosBloc productosBloc){
 
-    return FutureBuilder(
-      future: productosProvider.cargarProductos(),
-      builder: (BuildContext context, AsyncSnapshot<List<ProductoModel>> snapshot) {
+    return StreamBuilder(
+      stream: productosBloc.productosStream,
+      builder: (BuildContext context, AsyncSnapshot<List<ProductoModel>> snapshot){
         if ( snapshot.hasData ) {
 
           final productos = snapshot.data;
@@ -35,7 +38,7 @@ class HomePage extends StatelessWidget {
             shrinkWrap : true,
             scrollDirection: Axis.vertical,
             itemCount: productos.length,
-            itemBuilder: (context, i) => _crearItem(context, productos[i]),
+            itemBuilder: (context, i) => _crearItem(context, productosBloc, productos[i]),
             );
         } else {
           return Center(child: CircularProgressIndicator() );
@@ -43,18 +46,18 @@ class HomePage extends StatelessWidget {
       },
     );
 
+
   }
 
-  Widget _crearItem(BuildContext context, ProductoModel producto){
+  Widget _crearItem(BuildContext context, ProductosBloc productosBloc, ProductoModel producto){
     return  Dismissible (
 
         key: UniqueKey(),
         background: Container(
           color: Colors.red,
         ),
-        onDismissed: (direccion){
-          productosProvider.borrarProducto(producto.id);
-        },
+        onDismissed: (direccion)=>productosBloc.borrarProducto(producto.id),
+          // productosProvider.borrarProducto(producto.id)
         child: Card(
           child: Column(
             children: <Widget>[
